@@ -1,18 +1,15 @@
-FROM python:3.13-slim
-
-RUN apt-get update \
-    && apt-get install -y jq curl wget build-essential \
-    && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
+FROM python:3.13-slim-trixie
 
 WORKDIR /app
 
-# Install uv and create a virtual environment
-RUN pip install uv
-RUN uv venv
-ENV PATH="/app/.venv/bin:$PATH"
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+RUN sh /uv-installer.sh && rm /uv-installer.sh
+ENV PATH="/root/.local/bin/:$PATH"
 
-# Copy dependency files and sync
+#RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+#    mv /root/.local/bin/uv /usr/local/bin/uv
+
 COPY pyproject.toml uv.lock ./
 RUN uv sync
 
@@ -20,4 +17,4 @@ COPY . .
 
 ENV PYTHONPATH="/app"
 
-CMD ["python", "main.py"]
+CMD ["uv", "run", "main.py"]
