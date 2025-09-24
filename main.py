@@ -86,7 +86,7 @@ def main():
     }
 
     # Create the index if not existing already
-    if not client.indices.exists(index_name):
+    if not client.indices.exists(index=index_name):
         client.indices.create(index=index_name, body=index_body)
         print(f"Index '{index_name}' created.")
     else:

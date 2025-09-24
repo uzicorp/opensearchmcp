@@ -39,3 +39,5 @@ Remove docker containers to save space
 ```bash
 docker system prune
 ```
+
+When opensearch is running, you can access it at 172.18.0.2:9200
