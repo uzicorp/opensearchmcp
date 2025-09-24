@@ -6,12 +6,13 @@ from transformers import AutoModel, AutoTokenizer
 import torch
 
 # Load the BGE model and tokenizer
-tokenizer = AutoTokenizer.from_pretrained('BAAI/bge-small-en-v1.5')
-model = AutoModel.from_pretrained('BAAI/bge-small-en-v1.5')
+tokenizer = AutoTokenizer.from_pretrained("BAAI/bge-small-en-v1.5")
+model = AutoModel.from_pretrained("BAAI/bge-small-en-v1.5")
+
 
 def get_embedding(text):
     # Tokenize the text
-    encoded_input = tokenizer(text, padding=True, truncation=True, return_tensors='pt')
+    encoded_input = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
     # Compute token embeddings
     with torch.no_grad():
         model_output = model(**encoded_input)
@@ -21,13 +22,15 @@ def get_embedding(text):
     sentence_embeddings = torch.nn.functional.normalize(sentence_embeddings, p=2, dim=1)
     return sentence_embeddings.tolist()[0]
 
+
 def download_pdf(url, save_path):
     response = requests.get(url, stream=True)
-    response.raise_for_status() # Raise an exception for HTTP errors
-    with open(save_path, 'wb') as pdf_file:
+    response.raise_for_status()  # Raise an exception for HTTP errors
+    with open(save_path, "wb") as pdf_file:
         for chunk in response.iter_content(chunk_size=8192):
             pdf_file.write(chunk)
     print(f"Downloaded {url} to {save_path}")
+
 
 def extract_text_from_pdf(pdf_path):
     text = ""
@@ -39,6 +42,7 @@ def extract_text_from_pdf(pdf_path):
         print(f"Error extracting text from {pdf_path}: {e}")
     return text
 
+
 def main():
     # Environment variables for OpenSearch connection
     host = os.getenv("OPENSEARCH_HOST", "localhost")
@@ -48,8 +52,8 @@ def main():
 
     # Create the client with SSL/TLS configuration
     client = OpenSearch(
-        hosts=[{'host': host, 'port': port}],
-        http_compress=True, # enables gzip compression for request bodies
+        hosts=[{"host": host, "port": port}],
+        http_compress=True,  # enables gzip compression for request bodies
         use_ssl=False,
         verify_certs=False,
         ssl_assert_hostname=False,
@@ -67,29 +71,18 @@ def main():
     index_name = "documents"
     index_body = {
         "settings": {
-            "index": {
-                "knn": True,
-                "mapping": {
-                    "total_fields": {
-                        "limit": 10000
-                    }
-                }
-            }
+            "index": {"knn": True, "mapping": {"total_fields": {"limit": 10000}}}
         },
         "mappings": {
             "properties": {
                 "text_content": {"type": "text"},
                 "embedding": {
                     "type": "knn_vector",
-                    "dimension": 384, # BGE-small-en-v1.5 has 384 dimensions
-                    "method": {
-                        "name": "hnsw",
-                        "space_type": "l2",
-                        "engine": "nmslib"
-                    }
-                }
+                    "dimension": 384,  # BGE-small-en-v1.5 has 384 dimensions
+                    "method": {"name": "hnsw", "space_type": "l2", "engine": "nmslib"},
+                },
             }
-        }
+        },
     }
 
     # Create the index if not existing already
@@ -121,12 +114,13 @@ def main():
             document = {
                 "title": os.path.basename(pdf_filename),
                 "text_content": extracted_text,
-                "embedding": embeddings
+                "embedding": embeddings,
             }
             response = client.index(index=index_name, body=document)
             print(f"Document indexed: {response['result']}")
     except requests.exceptions.RequestException as e:
         print(f"Error downloading PDF: {e}")
+
 
 if __name__ == "__main__":
     main()
