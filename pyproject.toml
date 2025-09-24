@@ -10,7 +10,8 @@ dependencies = [
     "pypdf",
     "transformers",
     "torch",
-    "requests"
+    "requests",
+    "notebook>=7.4.5",
 ]
 
 [dependency-groups]

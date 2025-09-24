@@ -41,3 +41,15 @@ docker system prune
 ```
 
 When opensearch is running, you can access it at 172.18.0.2:9200
+
+You'll get this error if you have less than 95% disk space:
+```
+[2025-09-24T15:52:19,753][WARN ][o.o.c.r.a.DiskThresholdMonitor] [9dca2739160b] flood stage disk watermark [95%] exceeded on [4KDI3G8BRiy5awNE6rHVLQ][9dca2739160b][/usr/share/opensearch/data/nodes/0] free: 4.7gb[1.2%], all indices on this node will be marked read-only
+```
+And this error if you get less than 85%
+```
+opensearch      | org.opensearch.cluster.block.ClusterBlockException: index [.plugins-ml-config] blocked by: [TOO_MANY_REQUESTS/12/disk usage exceeded flood-stage watermark, index has read-only-allow-delete block];
+```
+
+
+ 
