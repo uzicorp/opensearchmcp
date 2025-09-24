@@ -4,7 +4,14 @@ version = "0.1.0"
 description = "MCP project for AZ"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+
+dependencies = [
+    "opensearch-py==3.0.0",
+    "pypdf",
+    "transformers",
+    "torch",
+    "requests"
+]
 
 [dependency-groups]
 dev = [
