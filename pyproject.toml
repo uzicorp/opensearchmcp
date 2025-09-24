@@ -12,6 +12,7 @@ dependencies = [
     "torch",
     "requests",
     "notebook>=7.4.5",
+    "litellm>=1.77.3",
 ]
 
 [dependency-groups]

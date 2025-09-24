@@ -31,9 +31,23 @@ services:
       - "8000:8000" # Example port for your application
     depends_on:
       - opensearch
+      - litellm-proxy
     environment:
       OPENSEARCH_HOST: opensearch
       OPENSEARCH_PORT: 9200
+    networks:
+      - opensearch-net
+
+  litellm-proxy:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: litellm_proxy
+    volumes:
+      - ./litellm_config.yaml:/app/litellm_config.yaml
+    ports:
+      - "4000:4000" # LiteLLM proxy runs on port 4000 by default
+    command: python -m litellm.proxy --config litellm_config.yaml --port 4000 --host 0.0.0.0
     networks:
       - opensearch-net
 

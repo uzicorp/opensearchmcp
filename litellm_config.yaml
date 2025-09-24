@@ -1,0 +1,7 @@
+model_list:
+  - model_name: bge-small-en-v1.5
+    litellm_params:
+      model: openai/bge-small-en-v1.5
+      api_base: https://api.openai.com/v1
+      # You might need to set an API key here if accessing a paid service
+      # api_key: os.environ.get("OPENAI_API_KEY")

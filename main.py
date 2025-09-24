@@ -2,25 +2,19 @@ from opensearchpy import OpenSearch
 import os
 import requests
 from pypdf import PdfReader
-from transformers import AutoModel, AutoTokenizer
-import torch
+import litellm
+# from transformers import AutoModel, AutoTokenizer
+# import torch
 
 # Load the BGE model and tokenizer
-tokenizer = AutoTokenizer.from_pretrained("BAAI/bge-small-en-v1.5")
-model = AutoModel.from_pretrained("BAAI/bge-small-en-v1.5")
+# tokenizer = AutoTokenizer.from_pretrained("BAAI/bge-small-en-v1.5")
+# model = AutoModel.from_pretrained("BAAI/bge-small-en-v1.5")
 
 
 def get_embedding(text):
-    # Tokenize the text
-    encoded_input = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
-    # Compute token embeddings
-    with torch.no_grad():
-        model_output = model(**encoded_input)
-    # Perform pooling. In this case, cls pooling.
-    sentence_embeddings = model_output[0][:, 0]
-    # Normalize embeddings
-    sentence_embeddings = torch.nn.functional.normalize(sentence_embeddings, p=2, dim=1)
-    return sentence_embeddings.tolist()[0]
+    # Use LiteLLM proxy for embedding
+    response = litellm.embedding(model="openai/bge-small-en-v1.5", input=[text], api_base="http://litellm-proxy:4000")
+    return response.data[0].embedding
 
 
 def download_pdf(url, save_path):
